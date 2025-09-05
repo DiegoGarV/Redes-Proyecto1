@@ -1,0 +1,5 @@
+Iniciando MCP server 'modpack' (STDIO)
+mc_versions(limit=2)
+mc_versions(limit=10)
+mc_versions(limit=5)
+search_mods(query='"Optifine"', page_size=3, index=0)

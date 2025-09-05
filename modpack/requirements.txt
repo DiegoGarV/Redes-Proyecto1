@@ -1,0 +1,7 @@
+anthropic
+typer[all]
+rich
+python-dotenv
+loguru
+mcp[cli]
+uv
