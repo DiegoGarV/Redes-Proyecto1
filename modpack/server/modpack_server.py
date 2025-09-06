@@ -55,30 +55,42 @@ async def _cf_get(path: str, params: Optional[Dict[str, Any]] = None) -> Dict[st
 async def mc_versions(limit: int = 10) -> List[str]:
     """Devuelve las últimas versiones de Minecraft conocidas por CurseForge (ej. '1.20.1')."""
     logger.info("mc_versions(limit=%s)", limit)
-    data = await _cf_get("/minecraft/game/versions")
-    versions = [v.get("name") for v in data.get("data", []) if v.get("name")]
-    # Orden suelen venir cronológicamente; invertimos para mostrar recientes primero
+    data = await _cf_get("/minecraft/modloader")
+    versions = []
+    for v in data.get("data", []):
+        gv = v.get("gameVersion")
+        if gv and gv not in versions:
+            versions.append(gv)
     versions = list(reversed(versions))
     return versions[:limit]
 
 @mcp.tool()
-async def search_mods(query: str, page_size: int = 5, index: int = 0) -> str:
-    """Busca mods por texto y devuelve lista breve (id, name, slug)."""
-    logger.info("search_mods(query=%r, page_size=%s, index=%s)", query, page_size, index)
+async def search_mods(query: str, page_size: int = 5, mc_version: str = None) -> str:
+    """
+    Busca mods en CurseForge por nombre. Filtra solo mods (no modpacks).
+    """
     params = {
-        "gameId": MINECRAFT_GAME_ID,
+        "gameId": 432,        # Minecraft
+        "classId": 6,         # Solo mods
         "searchFilter": query,
-        "pageSize": max(1, min(page_size, 50)),
-        "index": max(0, index),
+        "sortField": 2,       # Popularidad
+        "sortOrder": "desc",
+        "pageSize": page_size,
     }
+    if mc_version:
+        params["gameVersion"] = mc_version
+
     data = await _cf_get("/mods/search", params=params)
-    items = data.get("data", [])
-    lines = ["Resultados:"]
-    for m in items:
-        lines.append(f"- [{m.get('id')}] {m.get('name')} (/{m.get('slug')})")
-    if len(lines) == 1:
-        return "Sin resultados."
-    return "\n".join(lines)
+
+    if not data.get("data"):
+        return f"No se encontraron mods para '{query}'."
+
+    results = [
+        f"[{m['id']}] {m['name']} ({m['slug']})"
+        for m in data["data"]
+    ]
+    return "\n".join(results)
+
 
 @mcp.tool()
 async def mod_files(mod_id: int, page_size: int = 10, index: int = 0) -> str:

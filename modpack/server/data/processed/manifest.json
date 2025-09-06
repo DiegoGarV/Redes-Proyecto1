@@ -1,0 +1,29 @@
+{
+  "minecraft": {
+    "version": "\"1.20.1\"",
+    "modLoaders": [
+      {
+        "id": "\"forge\"",
+        "primary": true
+      }
+    ]
+  },
+  "files": [
+    {
+      "projectID": 238222,
+      "fileID": 4632296,
+      "required": true
+    },
+    {
+      "projectID": 306612,
+      "fileID": 4635570,
+      "required": true
+    }
+  ],
+  "manifestType": "minecraftModpack",
+  "manifestVersion": 1,
+  "name": "Modpack \"1.20.1\"-\"forge\"",
+  "version": "0.1.0",
+  "author": "diego",
+  "overrides": "overrides"
+}
